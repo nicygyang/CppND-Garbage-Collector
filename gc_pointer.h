@@ -158,28 +158,32 @@ bool Pointer<T, size>::collect(){
     // TODO: Implement collect function
     // LAB: New and Delete Project Lab
     // Note: collect() will be called in the destructor
-    bool memfree = false;
+   bool memFree = false;
     typename std::list<PtrDetails<T> >::iterator it;
-    int free_num = 0;
-    for (it = refContainer.begin(); it != refContainer.end(); it++) {
-        if (it->refcount > 0)
-            continue;
- 
-        free_num++;
-        refContainer.remove(*it);
+    do {
+        // Scan refContainer looking for unreferenced pointers
+        for (it = refContainer.begin(); it != refContainer.end(); it++) {
+    
+            if (it->refcount > 0)
+                continue;
+   
+            memFree = true;
+            refContainer.remove(*it);
 
-        if (it->memPtr) {
-            if (it->isArray) {
-                delete[] it->memPtr;
-            } else {
-                delete it->memPtr;
+            // Free memory unless the pointer is null.
+            if (it->memPtr) {
+                if (it->isArray) {
+                    delete[] it->memPtr;
+                } else {
+                    delete it->memPtr;
+                }
             }
+           
+            break;
         }
-    }
-    if (free_num)
-        memfree = true;
+    } while (it != refContainer.end());
  
-    return memfree;
+    return memFree;
 }
 
 // Overload assignment of pointer to Pointer.
